@@ -7,6 +7,8 @@ def criarTabEquip(lista):
         horas.append(i)
         i+=1
 
+    l_ponta = psg.Text('Início do horário de ponta')
+    ponta = psg.Input(key='-h_ponta-',size=2,default_text='18')
 
     l1 = psg.Text('Nome do equipamento')
     equip = psg.Input(key='-equip-',size = 20)
@@ -19,10 +21,6 @@ def criarTabEquip(lista):
 
 
     l3 = psg.Text('Horário de funcionamento')
-    # l31 = psg.Text('Início')
-    # h_inicio = psg.Combo(horas,size=8,key='-inicio-',readonly=True)
-    # l32 = psg.Text('Final')
-    # h_final = psg.Combo(horas,size=8,key='-final-',readonly=True)
     l31 = psg.Text('Início')
     h_inicio = psg.Input(key='-inicio-',size=6,default_text='00:00')
     l32 = psg.Text('Final')
@@ -31,7 +29,7 @@ def criarTabEquip(lista):
 
 
     b_add = psg.Button("Adicionar",key='-add-')
-    sup_col = [[psg.Column(col1),psg.Column(col2),psg.Column(col3)],[b_add]]
+    sup_col = [[l_ponta,ponta,psg.Text('h')],[psg.Column(col1),psg.Column(col2),psg.Column(col3)],[b_add]]
 
 
     l4 = psg.Text('Lista de equipamentos')

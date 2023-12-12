@@ -54,6 +54,8 @@ while True:
             psg.popup_auto_close("Preencha os dados da tarifa")
         elif len(itens['Equipamentos']) == 0:
             psg.popup_auto_close("Insira no mínimo um equipamento")
+        elif values['-h_ponta-'] == '' or values['-h_ponta-'] == None:
+            psg.popup_auto_close("Horário de ponta inválido")
         else:
             xl_name = psg.popup_get_text('Digite o nome da nova planilha',title="Nome do arquivo")
             if xl_name == None or xl_name == '':
@@ -61,7 +63,7 @@ while True:
             xl_name = xl_name+".xlsx"
             writer = pd.ExcelWriter(xl_name,engine="xlsxwriter")
             equipamentos.criar_equip(itens,writer)
-            consumo.criar_consumo(itens,writer,categoria,tarifas)
+            consumo.criar_consumo(itens,writer,categoria,tarifas,values)
             writer.close()
     
     if event == '-load-':

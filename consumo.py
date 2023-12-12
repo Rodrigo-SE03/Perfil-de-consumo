@@ -7,8 +7,8 @@ def get_hora(tempo):
     hora = h + (m/60)
     return hora
 
-def select_consumo(itens,categoria):  #TENHO QUE MUDAR AQUI PRA ARRUMAR A QUESTÃO DE DEFINIR OS HORÁRIOS DE PONTA
-
+def select_consumo(itens,categoria,values):  #TENHO QUE MUDAR AQUI PRA ARRUMAR A QUESTÃO DE DEFINIR OS HORÁRIOS DE PONTA
+    h_ponta = int(values['-h_ponta-'])
     if categoria == 'Convencional':
         consumo_dict = {'Horas':[],'Minutos':[],'Potência - kW':[]}
         for h in range(0,24):
@@ -33,9 +33,9 @@ def select_consumo(itens,categoria):  #TENHO QUE MUDAR AQUI PRA ARRUMAR A QUEST�
                 pot_i = 0
                 while i < len(itens['Equipamentos']):
                     if get_hora(f'{h}:{m}')>=get_hora(itens['Início'][i]) and get_hora(f'{h}:{m}')<get_hora(itens['Fim'][i]):   #MUDEI AQUI PRA FICAR IGUAL O EXEMPLO DO SLIDE
-                        if h==16 or h==20:
+                        if h==(h_ponta-1) or h==(h_ponta+3):
                             pot_i += float(itens['Potência'][i])
-                        elif h<16 or h>=21:
+                        elif h<(h_ponta-1) or h>=(h_ponta+4):
                             pot_fp += float(itens['Potência'][i])
                         else:
                             pot_p += float(itens['Potência'][i])
@@ -56,7 +56,7 @@ def select_consumo(itens,categoria):  #TENHO QUE MUDAR AQUI PRA ARRUMAR A QUEST�
                 pot_i = 0
                 while i < len(itens['Equipamentos']):
                     if get_hora(f'{h}:{m}')>=get_hora(itens['Início'][i]) and get_hora(f'{h}:{m}')<get_hora(itens['Fim'][i]):
-                        if h<17 or h>=20:
+                        if h<h_ponta or h>=(h_ponta+3):
                             pot_fp += float(itens['Potência'][i])
                         else:
                             pot_p += float(itens['Potência'][i])
@@ -69,8 +69,8 @@ def select_consumo(itens,categoria):  #TENHO QUE MUDAR AQUI PRA ARRUMAR A QUEST�
     return consumo_dict
     
 
-def criar_consumo(itens,writer,categoria,tarifas):
-    consumo_dict = select_consumo(itens,categoria)
+def criar_consumo(itens,writer,categoria,tarifas,values):
+    consumo_dict = select_consumo(itens,categoria,values)
 
     df_consumo = pd.DataFrame(consumo_dict)
     df_consumo.to_excel(writer, sheet_name="Consumo", startrow=1, header=False, index=False)
