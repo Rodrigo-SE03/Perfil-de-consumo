@@ -15,7 +15,7 @@ def calc_convencional(tarifas,consumo_dict):
     print(t)
     custo=0
 
-    for pot in consumo_dict["Potência "]:
+    for pot in consumo_dict["Potência - kW"]:
         custo += t*float(pot)/60
     
     valores = [custo,'-']
