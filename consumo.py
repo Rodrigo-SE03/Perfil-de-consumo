@@ -105,7 +105,7 @@ def calc_intervalo(categoria,inicio,fim,values):
 def select_consumo(itens,categoria,values):  
     h_ponta = int(values['-h_ponta-'])
     if categoria == 'Convencional':
-        consumo_dict = {'Horas':[],'Minutos':[],'Potência - kW':[]}
+        consumo_dict = {'Horas':[],'Minutos':[],'Instante':[],'Potência - kW':[]}
         for h in range(0,24):
             for m in range(0,60):
                 i=0
@@ -117,9 +117,10 @@ def select_consumo(itens,categoria,values):
                 consumo_dict['Potência - kW'].append(pot)
                 consumo_dict['Horas'].append(h)
                 consumo_dict['Minutos'].append(m)
+                consumo_dict['Instante'].append(0) 
     
     elif categoria == 'Branca':
-        consumo_dict = {'Horas':[],'Minutos':[],'Potência FP - kW':[],'Potência P - kW':[],'Potência I - kW':[]}
+        consumo_dict = {'Horas':[],'Minutos':[],'Instante':[],'Potência FP - kW':[],'Potência P - kW':[],'Potência I - kW':[]}
         for h in range(0,24):
             for m in range(0,60):
                 i=0
@@ -139,10 +140,11 @@ def select_consumo(itens,categoria,values):
                 consumo_dict['Potência P - kW'].append(pot_p)
                 consumo_dict['Potência I - kW'].append(pot_i)
                 consumo_dict['Horas'].append(h)
-                consumo_dict['Minutos'].append(m)         
+                consumo_dict['Minutos'].append(m)
+                consumo_dict['Instante'].append(0)         
     
     else:
-        consumo_dict = {'Horas':[],'Minutos':[],'Potência FP - kW':[],'Potência P - kW':[]}
+        consumo_dict = {'Horas':[],'Minutos':[],'Instante':[],'Potência FP - kW':[],'Potência P - kW':[]}
         for h in range(0,24):
             for m in range(0,60):
                 i=0
@@ -159,13 +161,17 @@ def select_consumo(itens,categoria,values):
                 consumo_dict['Potência FP - kW'].append(pot_fp)
                 consumo_dict['Potência P - kW'].append(pot_p)
                 consumo_dict['Horas'].append(h)
-                consumo_dict['Minutos'].append(m)    
+                consumo_dict['Minutos'].append(m) 
+                consumo_dict['Instante'].append(0) 
     
     return consumo_dict
     
 
 def criar_consumo(itens,writer,categoria,tarifas,values):
     consumo_dict = select_consumo(itens,categoria,values)
+
+    custo = calculo_tarifas.select_tarifa(tarifas,categoria,consumo_dict)
+    print(tarifas)
 
     df_consumo = pd.DataFrame(consumo_dict)
     df_consumo.to_excel(writer, sheet_name="Consumo geral", startrow=1, header=False, index=False)
@@ -177,8 +183,7 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
     worksheet.set_column(0, max_col - 1, 12)
     print(tarifas)
     
-    custo = calculo_tarifas.select_tarifa(tarifas,categoria,consumo_dict)
-    print(tarifas)
+    
     i=0
     for t in tarifas:
         if isinstance(t,str):
@@ -221,9 +226,15 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
             worksheet.write('G5',"Demanda P")
             worksheet.write('H5',custo[4]/tarifas[3],pot_format)
             worksheet.write('I5',custo[4],rs_format)
-        
+
+    hora_format = workbook.add_format({'num_format': 'hh:mm:ss'})
+    i=1
+    while i <= len(consumo_dict['Horas'])+1:
+        worksheet.write_formula(f'C{i+1}', f'=DATE(YEAR(TODAY()), MONTH(TODAY()), DAY(TODAY())) + TIME(A{i+1}, B{i+1}, 0)',hora_format)
+        i+=1
     
     worksheet.autofit()
+    worksheet.set_column("A:B",None, None,{"hidden":True})
     valores_equipamentos(itens,writer,categoria,values)
 
 def valores_equipamentos(itens,writer,categoria,values):
