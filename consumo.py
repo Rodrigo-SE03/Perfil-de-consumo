@@ -229,13 +229,35 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
 
     hora_format = workbook.add_format({'num_format': 'hh:mm:ss'})
     i=1
-    while i <= len(consumo_dict['Horas'])+1:
+    while i <= len(consumo_dict['Horas']):
         worksheet.write_formula(f'C{i+1}', f'=DATE(YEAR(TODAY()), MONTH(TODAY()), DAY(TODAY())) + TIME(A{i+1}, B{i+1}, 0)',hora_format)
         i+=1
     
     worksheet.autofit()
     worksheet.set_column("A:B",None, None,{"hidden":True})
+    criar_grafico(worksheet,workbook,categoria)
     valores_equipamentos(itens,writer,categoria,values)
+
+def criar_grafico(worksheet,workbook,categoria): #CRIAR OS GRÁFICOS DIFERENTES PARA TARIFA BRANCA E CONVENCIONAL
+    chart = workbook.add_chart({'type':'column'})
+    if categoria == 'Convencional':
+        chart.add_series({'categories':"='Consumo geral'!$C$2:$C$1441",'name': "Potência",'values':"='Consumo geral'!$D$2:$D$1441"})
+    elif categoria == 'Branca':
+        chart.add_series({'categories':"='Consumo geral'!$C$2:$C$1441",'name': "Potência - Fora Ponta",'values':"='Consumo geral'!$D$2:$D$1441"})
+        chart.add_series({'name':"Potência - Ponta",'values':"='Consumo geral'!$E$2:$E$1441"})
+        chart.add_series({'name':"Potência - Intermediário",'values':"='Consumo geral'!$F$2:$F$1441"})
+    else:
+        chart.add_series({'categories':"='Consumo geral'!$C$2:$C$1441",'name': "Potência - Fora Ponta",'values':"='Consumo geral'!$D$2:$D$1441"})
+        chart.add_series({'name':"Potência - Ponta",'values':"='Consumo geral'!$E$2:$E$1441"})
+    
+    chart.set_x_axis(
+    {
+        "interval_unit": 60,
+        "num_format": "h"
+    })
+    chart.set_size({'width': 700, 'height': 300})
+    chart.set_legend({'position': 'bottom'})
+    worksheet.insert_chart('H7', chart)
 
 def valores_equipamentos(itens,writer,categoria,values):
     if categoria == 'Verde' or categoria == 'Azul':

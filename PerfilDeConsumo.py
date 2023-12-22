@@ -93,6 +93,5 @@ while True:
 
 
 
-#Colocar a opção de setar o horário de ponta e horário intermediário -> Bem importante
 #Arrumar a questão da demanda nas tarifas verde e azul - cobrar de acordo com a demanda contratada
 #Ultrapassagem
