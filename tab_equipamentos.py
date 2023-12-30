@@ -11,7 +11,7 @@ def criarTabEquip(lista):
     ponta = psg.Input(key='-h_ponta-',size=2,default_text='18')
 
     l_dias = psg.Text('                 Nº de dias de funcionamento')
-    dias = psg.Input(key='-dias-',size=2,default_text='21')
+    dias = psg.Input(key='-dias-',size=2,default_text='22')
 
     l1 = psg.Text('Nome do equipamento')
     equip = psg.Input(key='-equip-',size = 20)

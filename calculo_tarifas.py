@@ -11,7 +11,7 @@ def select_tarifa(tarifas,categoria,consumo_dict):
         return calc_azul(tarifas,consumo_dict)
 
 def calc_convencional(tarifas,consumo_dict):
-    t = float(tarifas[0].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[0])
+    t = float(tarifas[0].replace(",",".")) if isinstance(tarifas[0],str) else float(tarifas[0])
     print(t)
     custo=0
 
@@ -22,9 +22,9 @@ def calc_convencional(tarifas,consumo_dict):
     return valores
 
 def calc_branca(tarifas,consumo_dict):
-    t_fp = float(tarifas[0].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[0])
-    t_p = float(tarifas[1].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[1])
-    t_i = float(tarifas[2].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[2])
+    t_fp = float(tarifas[0].replace(",",".")) if isinstance(tarifas[0],str) else float(tarifas[0])
+    t_p = float(tarifas[1].replace(",",".")) if isinstance(tarifas[1],str) else float(tarifas[1])
+    t_i = float(tarifas[2].replace(",",".")) if isinstance(tarifas[2],str) else float(tarifas[2])
     custo_fp=0
     custo_p=0
     custo_i=0
@@ -41,10 +41,10 @@ def calc_branca(tarifas,consumo_dict):
     return valores
 
 def calc_verde(tarifas,consumo_dict):
-    tc_fp = float(tarifas[0].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[0])
-    tc_p = float(tarifas[1].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[1])
+    tc_fp = float(tarifas[0].replace(",",".")) if isinstance(tarifas[0],str) else float(tarifas[0])
+    tc_p = float(tarifas[1].replace(",",".")) if isinstance(tarifas[1],str) else float(tarifas[1])
 
-    td = float(tarifas[2].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[2])
+    td = float(tarifas[2].replace(",",".")) if isinstance(tarifas[2],str) else float(tarifas[2])
 
     consumo_fp=0
     consumo_p=0
@@ -72,11 +72,11 @@ def calc_verde(tarifas,consumo_dict):
     return valores
 
 def calc_azul(tarifas,consumo_dict):
-    tc_fp = float(tarifas[0].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[0])
-    tc_p = float(tarifas[1].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[1])
+    tc_fp = float(tarifas[0].replace(",",".")) if isinstance(tarifas[0],str) else float(tarifas[0])
+    tc_p = float(tarifas[1].replace(",",".")) if isinstance(tarifas[1],str) else float(tarifas[1])
 
-    td_fp = float(tarifas[2].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[2])
-    td_p = float(tarifas[3].replace(",",".")) if isinstance(tarifas,str) else float(tarifas[3])
+    td_fp = float(tarifas[2].replace(",",".")) if isinstance(tarifas[2],str) else float(tarifas[2])
+    td_p = float(tarifas[3].replace(",",".")) if isinstance(tarifas[3],str) else float(tarifas[3])
 
     consumo_fp=0
     consumo_p=0

@@ -1,5 +1,5 @@
 import pandas as pd
-import calculo_tarifas
+import calculo_tarifas,estilos
 
 def get_hora(tempo):
     h = float(tempo.split(":")[0])
@@ -183,49 +183,13 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
     worksheet.set_column(0, max_col - 1, 12)
     print(tarifas)
     
-    
+
     i=0
     for t in tarifas:
         if isinstance(t,str):
             tarifas[i] = float(t.replace(",","."))
         i+=1
-    rs_format = workbook.add_format({'num_format':'R$ #,##0.00'})
-    pot_format = workbook.add_format({'num_format':'0.00 "kW"'})
-    nrg_format = workbook.add_format({'num_format':'0.00 "kWh"'})
-    if categoria == 'Convencional':
-        worksheet.write('G1',"Consumo:")
-        
-        worksheet.write('H1',custo[0]/tarifas[0],nrg_format)
-        worksheet.write('I1',custo[0],rs_format)
-    if categoria == 'Branca':
-        worksheet.write('G1',"Consumo FP:")
-        worksheet.write('H1',custo[0]/tarifas[0],nrg_format)
-        worksheet.write('I1',custo[0],rs_format)
-        worksheet.write('G2',"Consumo I:")
-        worksheet.write('H2',custo[2]/tarifas[2],nrg_format)
-        worksheet.write('I2',custo[2],rs_format)
-        worksheet.write('G3',"Consumo P:")
-        worksheet.write('H3',custo[1]/tarifas[1],nrg_format)
-        worksheet.write('I3',custo[1],rs_format)
-
-    elif categoria == 'Verde' or categoria == 'Azul':
-        worksheet.write('G1',"Consumo FP:")
-        worksheet.write('H1',custo[0]/tarifas[0],nrg_format)
-        worksheet.write('I1',custo[0],rs_format)
-        worksheet.write('G2',"Consumo P:")
-        worksheet.write('H2',custo[1]/tarifas[1],nrg_format)
-        worksheet.write('I2',custo[1],rs_format)
-        if categoria == 'Verde':
-            worksheet.write('G4',"Demanda")
-            worksheet.write('H4',custo[3]/tarifas[2],pot_format)
-            worksheet.write('I4',custo[3],rs_format)
-        else:
-            worksheet.write('G4',"Demanda FP")
-            worksheet.write('H4',custo[3]/tarifas[2],pot_format)
-            worksheet.write('I4',custo[3],rs_format)
-            worksheet.write('G5',"Demanda P")
-            worksheet.write('H5',custo[4]/tarifas[3],pot_format)
-            worksheet.write('I5',custo[4],rs_format)
+    estilos.consumo_geral_valores_dm(worksheet,workbook,categoria,tarifas,custo,int(values['-dias-']))
 
     hora_format = workbook.add_format({'num_format': 'hh:mm:ss'})
     i=1
@@ -255,31 +219,34 @@ def criar_grafico(worksheet,workbook,categoria): #CRIAR OS GRÁFICOS DIFERENTES 
         "interval_unit": 60,
         "num_format": "h"
     })
-    chart.set_size({'width': 700, 'height': 300})
+    chart.set_size({'width': 860, 'height': 300})
     chart.set_legend({'position': 'bottom'})
-    worksheet.insert_chart('H7', chart)
+    if categoria == "Branca":
+        worksheet.insert_chart('H9', chart)
+    else:
+        worksheet.insert_chart('G9', chart)
 
 def valores_equipamentos(itens,writer,categoria,values):
     if categoria == 'Verde' or categoria == 'Azul':
         equip_dict = {"Equipamento":[],
                     "Potência (kW)":[],
-                    "Horas - ponta":[],
-                    "Horas - fora ponta":[],
-                    "Total de horas":[],
-                    "Consumo - ponta":[],
-                    "Consumo - fora ponta":[],
-                    "Consumo total":[]}
+                    "H - Ponta":[],
+                    "H - Fora Ponta":[],
+                    "Total - H":[],
+                    "C - Ponta":[],
+                    "C - Fora Ponta":[],
+                    "Total - C":[]}
     elif categoria == 'Branca':
         equip_dict = {"Equipamento":[],
                     "Potência (kW)":[],
-                    "Horas - ponta":[],
-                    "Horas - intermediário":[],
-                    "Horas - fora ponta":[],
-                    "Total de horas":[],
-                    "Consumo - ponta":[],
-                    "Consumo - intermediário":[],
-                    "Consumo - fora ponta":[],
-                    "Consumo total":[]}
+                    "H - Ponta":[],
+                    "H - Intermediário":[],
+                    "H - Fora Ponta":[],
+                    "Total - H":[],
+                    "C - Ponta":[],
+                    "C - Intermediário":[],
+                    "C - Fora Ponta":[],
+                    "Total - C":[]}
     else:
         equip_dict = {"Equipamento":[],
                     "Potência (kW)":[],
@@ -294,29 +261,30 @@ def valores_equipamentos(itens,writer,categoria,values):
             equip_dict['Horas'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values))
             equip_dict['Consumo'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values))
         elif categoria == 'Verde' or categoria == 'Azul':
-            equip_dict['Horas - ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
-            equip_dict['Horas - fora ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
-            equip_dict['Total de horas'].append(equip_dict['Horas - ponta'][i]+equip_dict['Horas - fora ponta'][i])
-            equip_dict['Consumo - ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
-            equip_dict['Consumo - fora ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
-            equip_dict['Consumo total'].append(equip_dict['Potência (kW)'][i]*equip_dict['Total de horas'][i])
+            equip_dict['H - Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
+            equip_dict['H - Fora Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
+            equip_dict['Total - H'].append(equip_dict['H - Ponta'][i]+equip_dict['H - Fora Ponta'][i])
+            equip_dict['C - Ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
+            equip_dict['C - Fora Ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
+            equip_dict['Total - C'].append(equip_dict['Potência (kW)'][i]*equip_dict['Total - H'][i])
         else:
-            equip_dict['Horas - ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[2])
-            equip_dict['Horas - intermediário'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
-            equip_dict['Horas - fora ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
-            equip_dict['Total de horas'].append(equip_dict['Horas - ponta'][i]+equip_dict['Horas - fora ponta'][i]+equip_dict['Horas - intermediário'][i])
-            equip_dict['Consumo - ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[2])
-            equip_dict['Consumo - fora ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
-            equip_dict['Consumo - intermediário'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
-            equip_dict['Consumo total'].append(equip_dict['Potência (kW)'][i]*equip_dict['Total de horas'][i])
+            equip_dict['H - Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[2])
+            equip_dict['H - Intermediário'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
+            equip_dict['H - Fora Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
+            equip_dict['Total - H'].append(equip_dict['H - Ponta'][i]+equip_dict['H - Fora Ponta'][i]+equip_dict['H - Intermediário'][i])
+            equip_dict['C - Ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[2])
+            equip_dict['C - Fora Ponta'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
+            equip_dict['C - Intermediário'].append(itens['Potência'][i]*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
+            equip_dict['Total - C'].append(equip_dict['Potência (kW)'][i]*equip_dict['Total - H'][i])
         i+=1
     print(equip_dict)
     df_equip = pd.DataFrame(equip_dict)
-    df_equip.to_excel(writer, sheet_name="Consumo por equipamento", startrow=1, header=False, index=False)
+    df_equip.to_excel(writer, sheet_name="Consumo por equipamento", startrow=2, header=False, index=False)
     workbook = writer.book
     worksheet = writer.sheets["Consumo por equipamento"]
     (max_row, max_col) = df_equip.shape
     column_settings = [{"header": column} for column in df_equip.columns]
-    worksheet.add_table(0, 0, max_row, max_col - 1, {"columns": column_settings})
+    worksheet.add_table(1, 0, max_row+1, max_col-1, {"columns": column_settings})
     worksheet.set_column(0, max_col - 1, 12)
+    estilos.consumo_equip_style(worksheet,workbook,categoria)
     worksheet.autofit()
