@@ -1,6 +1,6 @@
 import PySimpleGUI as psg
 import pandas as pd
-import equipamentos, consumo, tab_equipamentos, tab_tarifas
+import equipamentos, consumo, tab_equipamentos, tab_tarifas,coletar_tarifas
 psg.set_options(font=("Arial Bold",14))
 categoria = ''
 itens = {'Equipamentos':[],
@@ -34,7 +34,7 @@ while True:
     event, values = window.read()  
     if event == '-add-':
         if values['-equip-'] in itens['Equipamentos']:
-            print(itens)
+            # print(itens)
             itens = remove_item(values['-equip-'],itens = itens)
             tab_equipamentos.updateEquip(itens=itens,itens_concat=itens_concat,window=window,edit=True)
         tab_equipamentos.saveEquip(event=event,values=values,itens=itens,itens_concat=itens_concat,window=window)
@@ -45,7 +45,7 @@ while True:
         else:
             val = lista.get()[0]
             itens = remove_item(val.split('-')[0],itens = itens)
-            print(itens_concat)
+            # print(itens_concat)
             itens_concat.remove(val)
             window['-list-'].update(itens_concat)
 
@@ -87,11 +87,13 @@ while True:
         categoria = tarifas_info[0]
         tarifas = tarifas_info[1]
         print(categoria,tarifas)
+    
+    if event == '-load_tarifas-':
+        coletar_tarifas.extrair_planilha(window)
+        window.Element('-reg-').click()
 
     if event == psg.WIN_CLOSED: 
         break  
 
 
 
-#Arrumar a questão da demanda nas tarifas verde e azul - cobrar de acordo com a demanda contratada
-#Ultrapassagem

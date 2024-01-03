@@ -43,7 +43,6 @@ def calc_branca(tarifas,consumo_dict):
 def calc_verde(tarifas,consumo_dict):
     tc_fp = float(tarifas[0].replace(",",".")) if isinstance(tarifas[0],str) else float(tarifas[0])
     tc_p = float(tarifas[1].replace(",",".")) if isinstance(tarifas[1],str) else float(tarifas[1])
-
     td = float(tarifas[2].replace(",",".")) if isinstance(tarifas[2],str) else float(tarifas[2])
 
     consumo_fp=0
@@ -54,7 +53,6 @@ def calc_verde(tarifas,consumo_dict):
         consumo_fp += tc_fp*float(pot)/60
     for pot in consumo_dict["Potência P - kW"]:
         consumo_p += tc_p*float(pot)/60
-    
     i=0
     max_dem = 0
     for pot in consumo_dict['Potência FP - kW']:

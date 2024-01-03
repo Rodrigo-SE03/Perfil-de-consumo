@@ -65,14 +65,14 @@ def change_tab(event,window):
         window['-azul_col-'].update(visible=True)
         window['-conv_col-'].update(visible=False)
 
-def criarTabTarifas():
+def criarTabTarifas(teste = '0,00'):
     r1 = psg.Radio("Grupo B - Convencional","categoria",key = '-conv-',default=False,enable_events=True)
     r2 = psg.Radio("Grupo B - Branca","categoria",key = '-branca-',default=False,enable_events=True)
     r3 = psg.Radio("Grupo A - Verde","categoria",key = '-verde-',default=True,enable_events=True)
     r4 = psg.Radio("Grupo A - Azul","categoria",key = '-azul-',default=False,enable_events=True)
 
     l1_conv = psg.Text('Tarifa de consumo')
-    tarifa_fp_conv = psg.Input(key='-tarifa_conv-',size = 10)
+    tarifa_fp_conv = psg.Input(key='-tarifa_conv-',size = 10,default_text=teste)
     col_conv = [[l1_conv,tarifa_fp_conv,psg.Text('R$/kWh')]]
 
     l1_branca = psg.Text('Tarifa de consumo Fora Ponta   ')
@@ -89,9 +89,9 @@ def criarTabTarifas():
     tarifa_p_verde = psg.Input(key='-tarifaP_verde-',size = 10)
     l3_verde = psg.Text('Tarifa de demanda')
     tarifa_dem_verde = psg.Input(key='-tarifaDEM_verde-',size = 10)
-    l4_verde = psg.Text('Valor de demanda contratada')
-    demC_verde = psg.Input(key='-tarifaDEMC_verde-',size = 10)
-    col_verde = [[l1_verde,tarifa_fp_verde,psg.Text('R$/kWh'),l4_verde,demC_verde,psg.Text('kW')],[l2_verde,tarifa_p_verde,psg.Text('R$/kWh')],[l3_verde,tarifa_dem_verde,psg.Text('R$/kW')]]
+    # l4_verde = psg.Text('Valor de demanda contratada')
+    # demC_verde = psg.Input(key='-tarifaDEMC_verde-',size = 10)
+    col_verde = [[l1_verde,tarifa_fp_verde,psg.Text('R$/kWh')],[l2_verde,tarifa_p_verde,psg.Text('R$/kWh')],[l3_verde,tarifa_dem_verde,psg.Text('R$/kW')]]
 
     l1_azul = psg.Text('Tarifa de consumo Fora Ponta')
     tarifa_fp_azul = psg.Input(key='-tarifaFP_azul-',size = 10)
@@ -101,13 +101,14 @@ def criarTabTarifas():
     tarifa_demFP_azul = psg.Input(key='-tarifaDEMFP_azul-',size = 10)
     l4_azul = psg.Text('Tarifa de demanda na Ponta   ')
     tarifa_demP_azul = psg.Input(key='-tarifaDEMP_azul-',size = 10)
-    l5_azul = psg.Text('Valor de demanda contratada Fora Ponta')
-    demCFP_azul = psg.Input(key='-tarifaDEMCFP_azul-',size = 10)
-    l6_azul = psg.Text('Valor de demanda contratada na Ponta    ')
-    demCP_azul = psg.Input(key='-tarifaDEMCP_azul-',size = 10)
-    col_azul= [[l1_azul,tarifa_fp_azul,psg.Text('R$/kWh'),l5_azul,demCFP_azul,psg.Text('kW')],[l2_azul,tarifa_p_azul,psg.Text('R$/kWh'),l6_azul,demCP_azul,psg.Text('kW')],[l3_azul,tarifa_demFP_azul,psg.Text('R$/kW')],[l4_azul,tarifa_demP_azul,psg.Text('R$/kW')]]
+    # l5_azul = psg.Text('Valor de demanda contratada Fora Ponta')
+    # demCFP_azul = psg.Input(key='-tarifaDEMCFP_azul-',size = 10)
+    # l6_azul = psg.Text('Valor de demanda contratada na Ponta    ')
+    # demCP_azul = psg.Input(key='-tarifaDEMCP_azul-',size = 10)
+    col_azul= [[l1_azul,tarifa_fp_azul,psg.Text('R$/kWh')],[l2_azul,tarifa_p_azul,psg.Text('R$/kWh')],[l3_azul,tarifa_demFP_azul,psg.Text('R$/kW')],[l4_azul,tarifa_demP_azul,psg.Text('R$/kW')]]
 
     b_registrar = psg.Button("Registrar",key='-reg-')
+    b_carregar = psg.Button("Carregar Tarifas",key='-load_tarifas-')
 
     return [[r1,r2,r3,r4],[psg.Column(col_conv,visible=False,key='-conv_col-'),psg.Column(col_branca,visible=False,key='-branca_col-'),
-                           psg.Column(col_verde,visible=True,key='-verde_col-'),psg.Column(col_azul,visible=False,key='-azul_col-')],[b_registrar]]
+                           psg.Column(col_verde,visible=True,key='-verde_col-'),psg.Column(col_azul,visible=False,key='-azul_col-')],[b_registrar,b_carregar]]
