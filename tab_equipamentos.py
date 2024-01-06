@@ -30,9 +30,16 @@ def criarTabEquip(lista):
     h_final = psg.Input(key='-final-',size=6,default_text='00:00')
     col3 =[[l3],[l31,h_inicio,l32,h_final]]
 
+    l5 = psg.Text('Fator de Potência')
+    fp = psg.Input(key='-fp-',default_text='1',size=4)
+    col5 = [[l5],[fp]]
+    l6 = psg.Text('Quantidade')
+    qtd = psg.Input(key='-qtd-',default_text='1',size=4)
+    col6 = [[l6],[qtd]]
+    
 
     b_add = psg.Button("Adicionar",key='-add-')
-    sup_col = [[l_ponta,ponta,psg.Text('h'),l_dias,dias],[psg.Column(col1),psg.Column(col2),psg.Column(col3)],[b_add]]
+    sup_col = [[l_ponta,ponta,psg.Text('h'),l_dias,dias],[psg.Column(col1),psg.Column(col2),psg.Column(col3)],[psg.Column(col5),psg.Column(col6)],[b_add]]
 
 
     l4 = psg.Text('Lista de equipamentos')

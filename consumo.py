@@ -193,7 +193,7 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
         if isinstance(t,str):
             tarifas[i] = float(t.replace(",","."))
         i+=1
-    estilos.consumo_geral_valores_dm(worksheet,workbook,categoria,tarifas,custo,int(values['-dias-']))
+    estilos.tabelas_geral(worksheet,workbook,categoria,tarifas,custo,int(values['-dias-']))
 
     hora_format = workbook.add_format({'num_format': 'hh:mm:ss'})
     i=1

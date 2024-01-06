@@ -1,3 +1,6 @@
+def skip(val,num=1):
+    return chr(ord(val)+num)
+
 def consumo_equip_style(worksheet,workbook,categoria):
     merge_format = workbook.add_format(
     {
@@ -30,7 +33,14 @@ def consumo_equip_style(worksheet,workbook,categoria):
     worksheet.write_blank(0,0,'',empty_format)
     worksheet.write_blank(0,1,'',empty_format)
 
-def consumo_geral_valores_dm(worksheet,workbook,categoria,tarifas,custo,dias):
+def tabelas_geral(worksheet,workbook,categoria,tarifas,custo,dias):
+    pos = "G1"
+
+    col = pos[0]
+    row = int(pos[1])
+
+    # next = chr(ord(col)+1)
+
     merge_format = workbook.add_format(
     {
         "bold": 1,
@@ -42,11 +52,11 @@ def consumo_geral_valores_dm(worksheet,workbook,categoria,tarifas,custo,dias):
     }
     )
     if categoria == "Branca":
-        worksheet.merge_range("H1:J1","Valores Diários",merge_format)
-        worksheet.merge_range("M1:O1","Valores Mensais",merge_format)
+        worksheet.merge_range(f"{skip(col)}{row}:{skip(col,3)}{row}","Valores Diários",merge_format)
+        worksheet.merge_range(f"{skip(col,6)}{row}:{skip(col,8)}{row}","Valores Mensais",merge_format)
     else:
-        worksheet.merge_range("G1:I1","Valores Diários",merge_format)
-        worksheet.merge_range("L1:N1","Valores Mensais",merge_format)
+        worksheet.merge_range(f"{col}{row}:{skip(col,2)}{row}","Valores Diários",merge_format)
+        worksheet.merge_range(f"{skip(col,5)}{row}:{skip(col,7)}{row}","Valores Mensais",merge_format)
 
     border = workbook.add_format({'border':1})
     rs_format = workbook.add_format({'num_format':'R$ #,##0.00','border':1})
@@ -54,87 +64,77 @@ def consumo_geral_valores_dm(worksheet,workbook,categoria,tarifas,custo,dias):
     nrg_format = workbook.add_format({'num_format':'#,##0.00 "kWh"','border':1})
     
     if categoria == 'Convencional':
-        worksheet.write('G2',"Consumo",border)
-        worksheet.write('H2',custo[0]/tarifas[0],nrg_format)
-        worksheet.write('I2',custo[0],rs_format)
+        worksheet.write(f'{col}{row+1}',"Consumo",border)
+        worksheet.write(f'{skip(col)}{row+1}',custo[0]/tarifas[0],nrg_format)
+        worksheet.write(f'{skip(col,2)}{row+1}',custo[0],rs_format)
 
-        worksheet.write('L2',"Consumo",border)
-        worksheet.write('M2',dias*custo[0]/tarifas[0],nrg_format)
-        worksheet.write('N2',dias*custo[0],rs_format)
+        worksheet.write(f'{skip(col,5)}{row+1}',"Consumo",border)
+        worksheet.write(f'{skip(col,6)}{row+1}',dias*custo[0]/tarifas[0],nrg_format)
+        worksheet.write(f'{skip(col,7)}{row+1}',dias*custo[0],rs_format)
 
     if categoria == 'Branca':
-        worksheet.write('H2',"Consumo FP",border)
-        worksheet.write('I2',custo[0]/tarifas[0],nrg_format)
-        worksheet.write('J2',custo[0],rs_format)
-        worksheet.write('H3',"Consumo I",border)
-        worksheet.write('I3',custo[2]/tarifas[2],nrg_format)
-        worksheet.write('J3',custo[2],rs_format)
-        worksheet.write('H4',"Consumo P",border)
-        worksheet.write('I4',custo[1]/tarifas[1],nrg_format)
-        worksheet.write('J4',custo[1],rs_format)
-        # worksheet.write('H5',"Total",border)
-        # worksheet.write('I5',"-",border)
-        # worksheet.write_formula('J5',"=SUM(J2:J4)",rs_format)
+        worksheet.write(f'{skip(col)}{row+1}',"Consumo FP",border)
+        worksheet.write(f'{skip(col,2)}{row+1}',custo[0]/tarifas[0],nrg_format)
+        worksheet.write(f'{skip(col,3)}{row+1}',custo[0],rs_format)
+        worksheet.write(f'{skip(col)}{row+2}',"Consumo I",border)
+        worksheet.write(f'{skip(col,2)}{row+2}',custo[2]/tarifas[2],nrg_format)
+        worksheet.write(f'{skip(col,3)}{row+2}',custo[2],rs_format)
+        worksheet.write(f'{skip(col)}{row+3}',"Consumo P",border)
+        worksheet.write(f'{skip(col,2)}{row+3}',custo[1]/tarifas[1],nrg_format)
+        worksheet.write(f'{skip(col,3)}{row+3}',custo[1],rs_format)
 
-
-        worksheet.write('M2',"Consumo FP",border)
-        worksheet.write('N2',dias*custo[0]/tarifas[0],nrg_format)
-        worksheet.write('O2',dias*custo[0],rs_format)
-        worksheet.write('M3',"Consumo I",border)
-        worksheet.write('N3',dias*custo[2]/tarifas[2],nrg_format)
-        worksheet.write('O3',dias*custo[2],rs_format)
-        worksheet.write('M4',"Consumo P",border)
-        worksheet.write('N4',dias*custo[1]/tarifas[1],nrg_format)
-        worksheet.write('O4',dias*custo[1],rs_format)
-        worksheet.write('M5',"Total",border)
-        worksheet.write('N5',"-",border)
-        worksheet.write_formula('O5',"=SUM(O2:O4)",rs_format)
+        worksheet.write(f'{skip(col,6)}{row+1}',"Consumo FP",border)
+        worksheet.write(f'{skip(col,7)}{row+1}',dias*custo[0]/tarifas[0],nrg_format)
+        worksheet.write(f'{skip(col,8)}{row+1}',dias*custo[0],rs_format)
+        worksheet.write(f'{skip(col,6)}{row+2}',"Consumo I",border)
+        worksheet.write(f'{skip(col,7)}{row+2}',dias*custo[2]/tarifas[2],nrg_format)
+        worksheet.write(f'{skip(col,8)}{row+2}',dias*custo[2],rs_format)
+        worksheet.write(f'{skip(col,6)}{row+3}',"Consumo P",border)
+        worksheet.write(f'{skip(col,7)}{row+3}',dias*custo[1]/tarifas[1],nrg_format)
+        worksheet.write(f'{skip(col,8)}{row+3}',dias*custo[1],rs_format)
+        worksheet.write(f'{skip(col,6)}{row+4}',"Total",border)
+        worksheet.write(f'{skip(col,7)}{row+4}',"-",border)
+        worksheet.write_formula(f'{skip(col,8)}{row+4}',f"=SUM({skip(col,8)}{row+1}:{skip(col,8)}{row+3})",rs_format)
 
     elif categoria == 'Verde' or categoria == 'Azul':
-        worksheet.write('G2',"Consumo FP",border)
-        worksheet.write('H2',custo[0]/tarifas[0],nrg_format)
-        worksheet.write('I2',custo[0],rs_format)
-        worksheet.write('G3',"Consumo P",border)
-        worksheet.write('H3',custo[1]/tarifas[1],nrg_format)
-        worksheet.write('I3',custo[1],rs_format)
+        worksheet.write(f'{col}{row+1}',"Consumo FP",border)
+        worksheet.write(f'{skip(col)}{row+1}',custo[0]/tarifas[0],nrg_format)
+        worksheet.write(f'{skip(col,2)}{row+1}',custo[0],rs_format)
+        worksheet.write(f'{col}{row+2}',"Consumo P",border)
+        worksheet.write(f'{skip(col)}{row+2}',custo[1]/tarifas[1],nrg_format)
+        worksheet.write(f'{skip(col,2)}{row+2}',custo[1],rs_format)
 
-        worksheet.write('L2',"Consumo FP",border)
-        worksheet.write('M2',dias*custo[0]/tarifas[0],nrg_format)
-        worksheet.write('N2',dias*custo[0],rs_format)
-        worksheet.write('L3',"Consumo P",border)
-        worksheet.write('M3',dias*custo[1]/tarifas[1],nrg_format)
-        worksheet.write('N3',dias*custo[1],rs_format)
+        worksheet.write(f'{skip(col,5)}{row+1}',"Consumo FP",border)
+        worksheet.write(f'{skip(col,6)}{row+1}',dias*custo[0]/tarifas[0],nrg_format)
+        worksheet.write(f'{skip(col,7)}{row+1}',dias*custo[0],rs_format)
+        worksheet.write(f'{skip(col,5)}{row+2}',"Consumo P",border)
+        worksheet.write(f'{skip(col,6)}{row+2}',dias*custo[1]/tarifas[1],nrg_format)
+        worksheet.write(f'{skip(col,7)}{row+2}',dias*custo[1],rs_format)
         if categoria == 'Verde':
-            worksheet.write('G4',"Demanda",border)
-            worksheet.write('H4',custo[3]/tarifas[2],pot_format)
-            worksheet.write('I4',custo[3],rs_format)
-            # worksheet.write('G5',"Total",border)
-            # worksheet.write('H5',"-",border)
-            # worksheet.write_formula('I5',"=SUM(H2:H4)",rs_format)
+            worksheet.write(f'{col}{row+3}',"Demanda",border)
+            worksheet.write(f'{skip(col)}{row+3}',custo[3]/tarifas[2],pot_format)
+            worksheet.write(f'{skip(col,2)}{row+3}',custo[3],rs_format)
 
-            worksheet.write('L4',"Demanda",border)
-            worksheet.write('M4',custo[3]/tarifas[2],pot_format)
-            worksheet.write('N4',custo[3],rs_format)
-            worksheet.write('L5',"Total",border)
-            worksheet.write('M5',"-",border)
-            worksheet.write_formula('N5',"=SUM(N2:N4)",rs_format)
+            worksheet.write(f'{skip(col,5)}{row+3}',"Demanda",border)
+            worksheet.write(f'{skip(col,6)}{row+3}',custo[3]/tarifas[2],pot_format)
+            worksheet.write(f'{skip(col,7)}{row+3}',custo[3],rs_format)
+            worksheet.write(f'{skip(col,5)}{row+4}',"Total",border)
+            worksheet.write(f'{skip(col,6)}{row+4}',"-",border)
+            worksheet.write_formula(f'{skip(col,6)}{row+4}',"=SUM(N2:N4)",rs_format)
         else:
-            worksheet.write('G4',"Demanda FP",border)
-            worksheet.write('H4',custo[3],pot_format)
-            worksheet.write('I4',custo[3]*tarifas[2],rs_format)
-            worksheet.write('G5',"Demanda P",border)
-            worksheet.write('H5',custo[4],pot_format)
-            worksheet.write('I5',custo[4]*tarifas[3],rs_format)
-            # worksheet.write('G6',"Total",border)
-            # worksheet.write('H6',"-",border)
-            # worksheet.write_formula('I6',"=SUM(H2:H5)",rs_format)
+            worksheet.write(f'{col}{row+3}',"Demanda FP",border)
+            worksheet.write(f'{skip(col)}{row+3}',custo[3],pot_format)
+            worksheet.write(f'{skip(col,2)}{row+3}',custo[3]*tarifas[2],rs_format)
+            worksheet.write(f'{col}{row+4}',"Demanda P",border)
+            worksheet.write(f'{skip(col)}{row+4}',custo[4],pot_format)
+            worksheet.write(f'{skip(col,2)}{row+4}',custo[4]*tarifas[3],rs_format)
             
-            worksheet.write('L4',"Demanda FP",border)
-            worksheet.write('M4',custo[3],pot_format)
-            worksheet.write('N4',custo[3]*tarifas[2],rs_format)
-            worksheet.write('L5',"Demanda P",border)
-            worksheet.write('M5',custo[4],pot_format)
-            worksheet.write('N5',custo[4]*tarifas[3],rs_format)
-            worksheet.write('L6',"Total",border)
-            worksheet.write('M6',"-",border)
-            worksheet.write_formula('N6',"=SUM(N2:N5)",rs_format)
+            worksheet.write(f'{skip(col,5)}{row+3}',"Demanda FP",border)
+            worksheet.write(f'{skip(col,6)}{row+3}',custo[3],pot_format)
+            worksheet.write(f'{skip(col,7)}{row+3}',custo[3]*tarifas[2],rs_format)
+            worksheet.write(f'{skip(col,5)}{row+4}',"Demanda P",border)
+            worksheet.write(f'{skip(col,6)}{row+4}',custo[4],pot_format)
+            worksheet.write(f'{skip(col,7)}{row+4}',custo[4]*tarifas[3],rs_format)
+            worksheet.write(f'{skip(col,5)}{row+5}',"Total",border)
+            worksheet.write(f'{skip(col,6)}{row+5}',"-",border)
+            worksheet.write_formula(f'{skip(col,7)}{row+5}',"=SUM(N2:N5)",rs_format)
