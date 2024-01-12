@@ -32,7 +32,8 @@ def criarTabEquip(lista):
 
     l5 = psg.Text('Fator de Potência')
     fp = psg.Input(key='-fp-',default_text='1',size=4)
-    col5 = [[l5],[fp]]
+    fp_tipo = psg.Combo(['Indutivo','Capacitivo'],default_value="Indutivo",key='-fp_tipo-',size=8)
+    col5 = [[l5],[fp,fp_tipo]]
     l6 = psg.Text('Quantidade')
     qtd = psg.Input(key='-qtd-',default_text='1',size=4)
     col6 = [[l6],[qtd]]
@@ -57,11 +58,14 @@ def saveEquip(event,values,itens,itens_concat,window):
     elif values['-equip-'] not in itens['Equipamentos']:
         itens['Equipamentos'].append(values['-equip-'])
         itens['Potência'].append(values['-pot-'])
+        itens['Fator de Potência'].append(values['-fp-'])
+        itens['Tipo - FP'].append(values['-fp_tipo-'])
         itens['Início'].append(values['-inicio-'])
         itens['Fim'].append(values['-final-'])
+        itens['Quantidade'].append(values['-qtd-'])
         i=0
         while i < len(itens['Equipamentos']):
-            itens_concat.add(f"{itens['Equipamentos'][i]}- {itens['Potência'][i]} kW  {itens['Início'][i]} - {itens['Fim'][i]}")
+            itens_concat.add(f"{itens['Equipamentos'][i]}- {itens['Potência'][i]} kW  FP: {itens['Fator de Potência'][i]}  {itens['Início'][i]} - {itens['Fim'][i]}")
             i+=1
         window['-list-'].update(itens_concat)
 
@@ -69,11 +73,11 @@ def updateEquip(itens,itens_concat,window,edit=False):
     i=0
     if edit == False:
         while i < len(itens['Equipamentos']):
-            itens_concat.add(f"{itens['Equipamentos'][i]}- {itens['Potência'][i]} kW  {itens['Início'][i]} - {itens['Fim'][i]}")
+            itens_concat.add(f"{itens['Equipamentos'][i]}- {itens['Potência'][i]} kW  FP: {itens['Fator de Potência'][i]}  {itens['Início'][i]} - {itens['Fim'][i]}")
             i+=1
     else:
         itens_concat.clear()
         while i < len(itens['Equipamentos']):
-            itens_concat.add(f"{itens['Equipamentos'][i]}- {itens['Potência'][i]} kW  {itens['Início'][i]} - {itens['Fim'][i]}")
+            itens_concat.add(f"{itens['Equipamentos'][i]}- {itens['Potência'][i]} kW  FP: {itens['Fator de Potência'][i]}  {itens['Início'][i]} - {itens['Fim'][i]}")
             i+=1
     window['-list-'].update(itens_concat)

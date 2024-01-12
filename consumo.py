@@ -1,5 +1,6 @@
 import pandas as pd
-import calculo_tarifas,estilos
+import calculo_tarifas,estilos,valores_por_hora
+import math
 
 def get_hora(tempo):
     h = float(tempo.split(":")[0])
@@ -28,13 +29,16 @@ def calc_intervalo(categoria,inicio,fim,values):
             else: 
                 intervalo[1] = 3
                 intervalo[0] += get_hora(fim) - (h_ponta+3)
-        elif get_hora(inicio) >= h_ponta:
+        elif get_hora(inicio) >= h_ponta and get_hora(inicio)<=(h_ponta+3):
             if get_hora(fim)>=(h_ponta+3):
                 intervalo[1] = (h_ponta+3)-get_hora(inicio)
                 intervalo[0] = get_hora(fim) - (h_ponta+3)
             else:
                 intervalo[1] = get_hora(fim)-get_hora(inicio)
                 intervalo[0] = 0
+        else:
+            intervalo[0] = get_hora(fim)-get_hora(inicio)
+            intervalo[1] = 0
     if categoria == 'Branca':
         intervalo = [0,0,0]
         if get_hora(fim) <= h_ponta-1:
@@ -148,22 +152,27 @@ def select_consumo(itens,categoria,values):
                 consumo_dict['Instante'].append(0)         
     
     else:
-        consumo_dict = {'Horas':[],'Minutos':[],'Instante':[],'Potência FP - kW':[],'Potência P - kW':[]}
+        consumo_dict = {'Horas':[],'Minutos':[],'Instante':[],'Potência FP - kW':[],'Potência P - kW':[],'Potência Reativa FP - kVAr':[],'Potência Reativa P - kVAr':[]}
         for h in range(0,24):
             for m in range(0,60):
                 i=0
                 pot_fp = 0
                 pot_p = 0
-                pot_i = 0
+                potr_fp = 0
+                potr_p = 0
                 while i < len(itens['Equipamentos']):
                     if get_hora(f'{h}:{m}')>=get_hora(itens['Início'][i]) and get_hora(f'{h}:{m}')<get_hora(itens['Fim'][i]):
                         if h<h_ponta or h>=(h_ponta+3):
-                            pot_fp += converter(itens['Potência'][i])
+                            pot_fp += converter(itens['Potência'][i])*converter(itens['Quantidade'][i])
+                            potr_fp += converter(itens['Potência'][i])*math.sqrt((1/math.pow(converter(itens['Fator de Potência'][i]),2))-1)*converter(itens['Quantidade'][i]) * (1 if itens['Tipo - FP'][i] == "Indutivo" else -1)
                         else:
-                            pot_p += converter(itens['Potência'][i])
+                            pot_p += converter(itens['Potência'][i])*converter(itens['Quantidade'][i])
+                            potr_p += converter(itens['Potência'][i])*math.sqrt((1/math.pow(converter(itens['Fator de Potência'][i]),2))-1)*converter(itens['Quantidade'][i]) * (1 if itens['Tipo - FP'][i] == "Indutivo" else -1)
                     i+=1
                 consumo_dict['Potência FP - kW'].append(pot_fp)
                 consumo_dict['Potência P - kW'].append(pot_p)
+                consumo_dict['Potência Reativa FP - kVAr'].append(potr_fp)
+                consumo_dict['Potência Reativa P - kVAr'].append(potr_p)
                 consumo_dict['Horas'].append(h)
                 consumo_dict['Minutos'].append(m) 
                 consumo_dict['Instante'].append(0) 
@@ -175,7 +184,6 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
     consumo_dict = select_consumo(itens,categoria,values)
 
     custo = calculo_tarifas.select_tarifa(tarifas,categoria,consumo_dict)
-    # print(tarifas)
 
     df_consumo = pd.DataFrame(consumo_dict)
     df_consumo.to_excel(writer, sheet_name="Consumo geral", startrow=1, header=False, index=False)
@@ -185,8 +193,6 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
     column_settings = [{"header": column} for column in df_consumo.columns]
     worksheet.add_table(0, 0, max_row, max_col - 1, {"columns": column_settings})
     worksheet.set_column(0, max_col - 1, 12)
-    # print(tarifas)
-    
 
     i=0
     for t in tarifas:
@@ -194,6 +200,9 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
             tarifas[i] = float(t.replace(",","."))
         i+=1
     estilos.tabelas_geral(worksheet,workbook,categoria,tarifas,custo,int(values['-dias-']))
+
+    if categoria == 'Verde' or categoria == 'Azul': #Tabela de reativos
+        valores_por_hora.tabela_por_hora(custo,categoria,writer,tarifas,int(values['-dias-']))
 
     hora_format = workbook.add_format({'num_format': 'hh:mm:ss'})
     i=1
@@ -227,6 +236,8 @@ def criar_grafico(worksheet,workbook,categoria): #CRIAR OS GRÁFICOS DIFERENTES 
     chart.set_legend({'position': 'bottom'})
     if categoria == "Branca":
         worksheet.insert_chart('H9', chart)
+    elif categoria == 'Verde' or categoria == 'Azul':
+        worksheet.insert_chart('I9', chart)
     else:
         worksheet.insert_chart('G9', chart)
 
@@ -260,28 +271,27 @@ def valores_equipamentos(itens,writer,categoria,values):
     i=0
     for equip in itens['Equipamentos']:
         equip_dict['Equipamento'].append(equip)
-        equip_dict['Potência (kW)'].append(converter(itens['Potência'][i]))
+        equip_dict['Potência (kW)'].append(converter(itens['Potência'][i])*converter(itens['Quantidade'][i]))
         if categoria == 'Convencional':
             equip_dict['Horas'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values))
-            equip_dict['Consumo (kWh)'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values))
+            equip_dict['Consumo (kWh)'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)*converter(itens['Quantidade'][i]))
         elif categoria == 'Verde' or categoria == 'Azul':
             equip_dict['H - Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
             equip_dict['H - Fora Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
             equip_dict['Total - H'].append(equip_dict['H - Ponta'][i]+equip_dict['H - Fora Ponta'][i])
-            equip_dict['C - Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
-            equip_dict['C - Fora Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
+            equip_dict['C - Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1]*converter(itens['Quantidade'][i]))
+            equip_dict['C - Fora Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0]*converter(itens['Quantidade'][i]))
             equip_dict['Total - C'].append(equip_dict['Potência (kW)'][i]*equip_dict['Total - H'][i])
         else:
             equip_dict['H - Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[2])
             equip_dict['H - Intermediário'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
             equip_dict['H - Fora Ponta'].append(calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
             equip_dict['Total - H'].append(equip_dict['H - Ponta'][i]+equip_dict['H - Fora Ponta'][i]+equip_dict['H - Intermediário'][i])
-            equip_dict['C - Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[2])
-            equip_dict['C - Fora Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0])
-            equip_dict['C - Intermediário'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1])
+            equip_dict['C - Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[2]*converter(itens['Quantidade'][i]))
+            equip_dict['C - Fora Ponta'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[0]*converter(itens['Quantidade'][i]))
+            equip_dict['C - Intermediário'].append(converter(itens['Potência'][i])*calc_intervalo(categoria,itens['Início'][i],itens['Fim'][i],values)[1]*converter(itens['Quantidade'][i]))
             equip_dict['Total - C'].append(equip_dict['Potência (kW)'][i]*equip_dict['Total - H'][i])
         i+=1
-    # print(equip_dict)
     df_equip = pd.DataFrame(equip_dict)
     df_equip.to_excel(writer, sheet_name="Consumo por equipamento", startrow=2, header=False, index=False)
     workbook = writer.book

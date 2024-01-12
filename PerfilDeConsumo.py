@@ -5,8 +5,11 @@ psg.set_options(font=("Arial Bold",14))
 categoria = ''
 itens = {'Equipamentos':[],
          'Potência':[],
+         'Fator de Potência':[],
+         'Tipo - FP':[],
          'Início':[],
-         'Fim':[]
+         'Fim':[],
+         'Quantidade':[]
          }
 itens_concat = set()
 
@@ -26,8 +29,11 @@ def remove_item(val,itens):
     id = itens['Equipamentos'].index(val)
     itens['Equipamentos'].pop(id)
     itens['Potência'].pop(id)
+    itens['Fator de Potência'].pop(id)
+    itens['Tipo - FP'].pop(id)
     itens['Início'].pop(id)
     itens['Fim'].pop(id)
+    itens['Quantidade'].pop(id)
     return itens
 
 while True:    
