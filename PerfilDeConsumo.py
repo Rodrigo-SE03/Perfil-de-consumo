@@ -95,7 +95,21 @@ while True:
         print(categoria,tarifas)
     
     if event == '-load_tarifas-':
-        coletar_tarifas.extrair_planilha(window)
+        t_import = psg.popup("De qual fonte deseja importar os dados das tarifas?",button_type=psg.POPUP_BUTTONS_YES_NO,custom_text = ('Planilha','Equatorial'))
+        if t_import == "Planilha":
+            load_tarifas = psg.popup_get_file('Selecione a planilha que deseja carregar',  title="Carregar arquivo")
+            if load_tarifas == None or load_tarifas == '':
+                continue
+            try:
+                coletar_tarifas.extrair_planilha(window,load_tarifas)
+            except: 
+                psg.popup_auto_close("Arquivo inválido")
+                continue
+        elif t_import == "Equatorial":
+            psg.popup_no_buttons('Aguarde a extração dos dados',auto_close=True,keep_on_top=True,auto_close_duration=3,non_blocking=True)
+            coletar_tarifas.extrair_site(window)
+        else: 
+            continue
         window.Element('-reg-').click()
 
     if event == psg.WIN_CLOSED: 
