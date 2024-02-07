@@ -1,6 +1,8 @@
 import openpyxl
 from bs4 import BeautifulSoup
 import requests
+import PySimpleGUI as psg
+from time import sleep
 
 def extrair_planilha(window,planilha):
     wb = openpyxl.load_workbook(planilha)
@@ -29,8 +31,13 @@ def extrair_site(window):
     b_tarifas = []
 
     a_table = a_soup.find('table',width="577")
-    a_table_body = a_table.find('tbody')
-
+    try:
+        a_table_body = a_table.find('tbody')
+    except:
+        sleep(1.5)
+        psg.popup_auto_close("Funcionalidade indisponível no momento")
+        return
+    
     b_table = b_soup.find('table',width="900")
     b_table_body = b_table.find('tbody')
 

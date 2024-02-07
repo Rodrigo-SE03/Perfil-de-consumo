@@ -1,6 +1,6 @@
 import PySimpleGUI as psg
 import pandas as pd
-import equipamentos, consumo, tab_equipamentos, tab_tarifas,coletar_tarifas
+import equipamentos, consumo, tab_equipamentos, tab_tarifas,coletar_tarifas,comparativo
 psg.set_options(font=("Arial Bold",14))
 categoria = ''
 itens = {'Equipamentos':[],
@@ -27,13 +27,8 @@ window = psg.Window('Perfil de Consumo', layout)
 
 def remove_item(val,itens):
     id = itens['Equipamentos'].index(val)
-    itens['Equipamentos'].pop(id)
-    itens['Potência'].pop(id)
-    itens['Fator de Potência'].pop(id)
-    itens['Tipo - FP'].pop(id)
-    itens['Início'].pop(id)
-    itens['Fim'].pop(id)
-    itens['Quantidade'].pop(id)
+    for key in itens.keys():
+        itens[key].pop(id)
     return itens
 
 while True:    
@@ -71,6 +66,8 @@ while True:
             equipamentos.criar_equip(itens,writer)
             consumo.criar_consumo(itens,writer,categoria,tarifas,values)
             writer.close()
+            comparativo.criar_complementar(itens,categoria,tarifas,values,xl_name)
+            comparativo.comparar(xl_name,categoria)
     
     if event == '-load-':
         load_file = psg.popup_get_file('Selecione a planilha que deseja carregar',  title="Carregar arquivo")
@@ -114,6 +111,3 @@ while True:
 
     if event == psg.WIN_CLOSED: 
         break  
-
-
-

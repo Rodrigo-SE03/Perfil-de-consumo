@@ -180,7 +180,7 @@ def select_consumo(itens,categoria,values):
     return consumo_dict
     
 
-def criar_consumo(itens,writer,categoria,tarifas,values):
+def criar_consumo(itens,writer,categoria,tarifas,values):  
     consumo_dict = select_consumo(itens,categoria,values)
 
     custo = calculo_tarifas.select_tarifa(tarifas,categoria,consumo_dict)
@@ -215,7 +215,7 @@ def criar_consumo(itens,writer,categoria,tarifas,values):
     criar_grafico(worksheet,workbook,categoria)
     valores_equipamentos(itens,writer,categoria,values)
 
-def criar_grafico(worksheet,workbook,categoria): #CRIAR OS GRÁFICOS DIFERENTES PARA TARIFA BRANCA E CONVENCIONAL
+def criar_grafico(worksheet,workbook,categoria): 
     chart = workbook.add_chart({'type':'column'})
     if categoria == 'Convencional':
         chart.add_series({'categories':"='Consumo geral'!$C$2:$C$1441",'name': "Potência",'values':"='Consumo geral'!$D$2:$D$1441"})
